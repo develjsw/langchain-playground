@@ -1,34 +1,83 @@
-# Document Chunking 정리
+# 청킹(Chunking) 개요
 
-`chunking/` 폴더에서 테스트한 청킹(chunking) 내용을 정리한 문서
-> 로딩(파싱)·설치 등 전제 내용은 `../loading/loader.md` 참고
+문서를 청크로 나누는 방법 정리, LangChain 공식 문서 기준으로 선택지가 여러 갈래로 나뉨
+> 로딩(파싱)·설치 전제는 `../loading/loader.md` 참고
+> 도구별 상세는 각 하위 폴더(`unstructured/`, `docling/`, `recursive-character-text-splitter/`) 참고
 
-## 1. 전제 (구성)
+## 1. 두 갈래 (공식 문서 기준)
 
-- `langchain-unstructured`(어댑터) + `unstructured`(엔진) 조합으로 처리 (상세 → `loader.md`)
-- 청킹은 별도 splitter 없이 **`UnstructuredLoader`의 옵션**으로 수행
-- 확장자별 부분 설치 필요 ex) `pip install -qU "unstructured[docx]"`
+LangChain은 청킹을 크게 두 카테고리로 제공
 
-## 2. 청킹 전략
+| 갈래 | 무엇 | 공식 문서 |
+|------|------|-----------|
+| **로더 내장 청킹** | 로더가 파싱하면서 옵션으로 청킹/분할까지 수행 | https://docs.langchain.com/oss/python/integrations/document_loaders |
+| **독립 splitter** | 이미 로드된 텍스트를 별도로 잘라줌 | https://docs.langchain.com/oss/python/integrations/splitters/recursive_text_splitter |
 
-| 전략 | 동작 | 적합한 문서 |
-|------|------|-------------|
-| `basic` | 구조 무시, 크기(`max_characters`) 채워서 자르기 | 구조 없는 줄글 (에세이·로그·자막) |
-| `by_title` | 제목(섹션) 만나면 새 청크 시작 | 구조 있는 문서 (법령·계약서·논문·매뉴얼) |
+→ document_loaders에 나오는 docling·unstructured·upstage 등은 **로더 자체에 청킹 옵션 포함**, recursive 계열은 **독립 splitter**
 
-### 전략 분류 + 도구 매핑
+## 2. 로더 내장 청킹 (docling · unstructured · upstage 등)
 
-알려진 청킹 전략은 크게 5가지, unstructured는 그중 2가지(`basic`·`by_title`)만 제공하고 나머지는 LangChain 공식 문서의 splitter를 참고
+| 로더 | 내장 옵션 | 동작 | 공식 문서 |
+|------|-----------|------|-----------|
+| **unstructured** | `chunking_strategy` (`basic`·`by_title`) | 요소를 크기로 묶거나 섹션 경계로 분할 | https://docs.unstructured.io/open-source/core-functionality/chunking |
+| **docling** | `export_type` (`DOC_CHUNKS`·`MARKDOWN`) + `chunker`(예: `HybridChunker`) | 구조·토큰 기반 청킹 또는 통째 마크다운 | https://docs.langchain.com/oss/python/integrations/document_loaders/docling |
+| **upstage** | `split` (`none`·`page`·`element`) | 분할 안 함 / 페이지 / 요소 단위 (※ 크기 기반 청킹이 아니라 **구조 단위 분할**) | https://docs.langchain.com/oss/python/integrations/document_loaders/upstage |
 
-**분류별 설명**
+- unstructured 상세 → `unstructured/chunking.md`
+- docling 상세 → `docling/chunking.md`
+
+## 3. 독립 splitter — `RecursiveCharacterTextSplitter`
+
+- **분류상 "재귀"**: 단락(`\n\n`) → 줄바꿈(`\n`) → 공백 순서로 큰 단위부터 시도하며 크기가 맞을 때까지 작게 잘라가는 방식
+- 패키지: `langchain-text-splitters` (현역, sunset 아님)
+- 사용 패턴: `loader.load()` → `splitter.split_documents(docs)` (`load_and_split`은 deprecated이므로 안 씀)
+
+### 예전엔 docx2txt와 자주 썼지만 지금은 아님
+
+- 과거: `langchain-community`의 `Docx2txtLoader` + `RecursiveCharacterTextSplitter` 조합이 흔했음
+- 그러나 **`langchain-community`가 2026-06-19 아카이브(sunset)** → 신규 의존 비권장
+  - 출처: [Sunsetting langchain-community (issue #674)](https://github.com/langchain-ai/langchain-community/issues/674)
+- ∴ recursive는 이제 **다른 현역 로더와 함께** 써야 함
+
+### Loader별 recursive 조합법
+
+- **docling (권장)** : `export_type=ExportType.MARKDOWN`으로 전체를 1 Document로 받은 뒤 splitter 적용
+  ```python
+  from langchain_docling import DoclingLoader
+  from langchain_docling.loader import ExportType
+  from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+  loader = DoclingLoader(
+      file_path='../files/doc/tax.docx',
+      export_type=ExportType.MARKDOWN,   # 통째로 받기 (기본 DOC_CHUNKS는 자동 청킹됨)
+  )
+  docs = loader.load()
+  chunks = RecursiveCharacterTextSplitter(
+      chunk_size=1000, chunk_overlap=100,
+  ).split_documents(docs)
+  ```
+- **unstructured (우회, 비권장)** : `mode` 미지원이라 `chunking_strategy="basic"` + `max_characters`=거대값 + `include_orig_elements=False`로 한 덩이로 받아야 함 → 부자연스러움
+  - 출처: [LangChain Unstructured 통합](https://docs.langchain.com/oss/python/integrations/document_loaders/unstructured_file)
+- **docx2txt 직접 호출** : langchain 래퍼 없이 `docx2txt.process()` → `Document` 직접 생성 → splitter (community 의존 0)
+  ```python
+  import docx2txt
+  from langchain_core.documents import Document
+  from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+  text = docx2txt.process('../files/doc/tax.docx')
+  docs = [Document(page_content=text, metadata={'source': 'tax.docx'})]
+  chunks = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100).split_documents(docs)
+  ```
+
+## 4. 청킹 전략 5분류 (일반)
+
+알려진 청킹 전략은 크게 5가지, 도구마다 제공 범위가 다름
 
 - **고정 길이** : 글자 수나 토큰 수 기준(예: 500자)으로 무조건 자르는 방식
-- **재귀** : 단락(`\n\n`) → 줄바꿈(`\n`) → 공백 순서로 큰 단위부터 시도하며 크기가 맞을 때까지 작게 잘라가는 방식
+- **재귀** : 단락 → 줄바꿈 → 공백 순서로 큰 단위부터 시도하며 크기가 맞을 때까지 작게 잘라가는 방식
 - **문서 구조** : 마크다운 헤더(`#`, `##`)·HTML 태그·목차·표(Table) 등 문서 구조를 기준으로 나눔
 - **의미 기반** : 임베딩 모델로 문맥을 분석해 주제·의미가 바뀌는 지점(Breakpoint)을 찾아 분할
 - **에이전틱/LLM** : LLM이 문서 전체를 읽고 핵심 명제(Proposition)나 의도에 맞춰 직접 분할 지점을 결정
-
-**도구 매핑**
 
 | 분류 | unstructured 청킹 전략 옵션 | 대표 도구 (그 외) |
 |------|------|------|
@@ -38,44 +87,21 @@
 | 의미 기반 | `by_similarity`(임베딩 유사도, 상용) | LangChain `SemanticChunker` (`langchain_experimental`)<br>- |
 | 에이전틱/LLM | 없음 | **공식 구현 없음** → 직접 LLM 호출로 구현<br>- |
 
-- → unstructured는 **문서 구조 기반에 강함**(`by_title`·`by_page`), 의미 기반은 상용 전용, 재귀·에이전틱은 미제공
-- 출처(unstructured): [오픈소스 chunking](https://docs.unstructured.io/open-source/core-functionality/chunking)
 - ※ `by_page`·`by_similarity`는 unstructured **상용 Platform/API 전용**(무료 15,000페이지 + 초과분 과금), 오픈소스 라이브러리엔 없음
 - ※ `SemanticChunker`는 `langchain_experimental.text_splitter`에 실재(deprecated 아님, GitHub 이슈 #35553에서 확인)하나, 새 레퍼런스 사이트 개편으로 **개별 클래스의 안정적 공식 URL이 현재 없음**(딥링크가 검색 랜딩으로 리다이렉트됨)
 
-## 3. 청킹 옵션
+## 5. 폴더 구조
 
-| 옵션 | 의미 | 비고 |
-|------|------|------|
-| `max_characters` | 청크 최대 글자 수 (**하드 리밋**, 절대 못 넘음) | 우선순위 가장 높음 |
-| `new_after_n_chars` | 이 글자 수 넘으면 다음 경계에서 미리 끊음 (**소프트 리밋**) | 보통 `max`의 70~80% |
-| `combine_text_under_n_chars` | 이보다 짧은 청크는 다음 것과 합침 | 잘게 쪼개짐·노이즈 방지 |
-| `overlap` | 겹칠 글자 수 | **기본은 큰 element가 강제 분할될 때만** 적용 |
-| `overlap_all` | `True`면 **모든 인접 청크 경계**에 overlap 적용 | 중복↑·표 등 부작용 주의 |
-| `include_orig_elements` | 합쳐지기 전 원본 요소를 메타데이터로 보존 | `False`면 경량화 |
-| `languages` | 파싱 언어 지정 (예: `['kor']`) | 한글 문서 정확도↑ |
-
-> **우선순위**: `max_characters`(하드) > `by_title`(의미 경계) > `new_after_n_chars`(소프트) > 먼저 걸리는 조건에서 끊되, 하드 리밋은 절대 못 넘음
-
-### 추천 예시 (구조 있는 한글 PDF, RAG 용도)
-
-```python
-loader = UnstructuredLoader(
-    '../files/pdf/medical-law-2026-04.pdf',
-    chunking_strategy='by_title',
-    max_characters=1000,
-    new_after_n_chars=800,
-    combine_text_under_n_chars=200,
-    overlap=150,
-    include_orig_elements=False,
-    languages=['kor'],
-)
 ```
-## 4. 참고 문서
-
-- `unstructured` 청킹 옵션: https://docs.unstructured.io/open-source/core-functionality/chunking
-
-## 5. 참고 내용
-
-- 청크 크기 가이드 (RAG best practices): https://unstructured.io/blog/chunking-for-rag-best-practices
-  - **약 250 토큰(약 1,000자) 정도의 청크 크기가 실험을 시작하기에 적절한 지점**이라고 표현됨
+chunking/
+├── chunking.md                          ← (이 문서) 전체 개요·인덱스
+├── unstructured/                        UnstructuredLoader 청킹 (basic/by_title)
+│   ├── chunking.md                      unstructured 전용 상세
+│   ├── 01-docx-chunking.ipynb
+│   ├── 02-csv-chunking.ipynb
+│   └── 03.pdf-chunking.ipynb
+├── docling/                             DoclingLoader 청킹 (DOC_CHUNKS/MARKDOWN)
+│   └── 01-docx-chunking.ipynb
+└── recursive-character-text-splitter/   RecursiveCharacterTextSplitter 예제
+    └── 01-docx-chunking.ipynb
+```
