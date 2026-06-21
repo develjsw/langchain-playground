@@ -1,40 +1,59 @@
-# Document Loader (Parsing) 정리
+# Document Loader (Parsing) 개요
 
-`loading/` 폴더에서 테스트한 문서 로딩(파싱) 내용을 정리한 문서
+문서를 읽어 텍스트/구조로 파싱하는 방법 정리, LangChain은 여러 로더를 선택지로 제공
 > 청킹(chunking) 내용은 `../chunking/chunking.md` 참고
+> 도구별 상세는 각 하위 폴더(`unstructured/`, `docling/`) 참고
 
-## 1. 구성 (어댑터 + 엔진)
+## 1. 로더 선택지 (공식 문서 기준)
 
-| 패키지 | 역할 |
-|--------|------|
-| `langchain-unstructured` | **어댑터(인터페이스)** — LangChain의 `UnstructuredLoader` 제공 |
-| `unstructured` | **실제 파싱 엔진** — 문서를 읽고 element로 분해 |
+LangChain document_loaders에는 다양한 로더가 동급으로 나열됨 (특정 권장 없음)
 
-- `unstructured` 전체를 받으면 의존성이 무거우므로, **필요한 확장자만** 설치
-- `"unstructured[확장자]"` 형태로 부분 설치
+| 로더 | 패키지 | 특징 | 공식 문서 |
+|------|--------|------|-----------|
+| **unstructured** | `langchain-unstructured` + `unstructured` | 요소(element) 단위 파싱, 청킹 옵션 내장 | https://docs.langchain.com/oss/python/integrations/document_loaders/unstructured_file |
+| **docling** | `langchain-docling` | PDF·DOCX·PPTX·HTML 등을 레이아웃·표 포함 구조로 파싱 | https://docs.langchain.com/oss/python/integrations/document_loaders/docling |
+| **upstage** | `langchain-upstage` | `UpstageDocumentParseLoader`, 레이아웃 분석 기반 파싱 | https://docs.langchain.com/oss/python/integrations/document_loaders/upstage |
 
-```bash
-# 예시: CSV만 필요할 때
-pip install -qU langchain langchain-unstructured "unstructured[csv]"
-# pdf → "unstructured[pdf]", docx → "unstructured[docx]" ...
-```
+- 전체 목록: https://docs.langchain.com/oss/python/integrations/document_loaders
+- unstructured 상세 → `unstructured/loader.md`
+- docling 상세 → `docling/loader.md`
 
-## 2. 기본 동작
+## 2. 공통 동작 (대부분의 로더)
 
-- `UnstructuredLoader(...).load()` 는 **항상 `List[Document]`** 반환 (파일 종류 무관)
-- 기본은 문서를 **의미 요소(element) 단위로 분해**하므로, 청킹 없이도 `len(docs)`가 매우 클 수 있음 ex) PDF 2304개
-- `load_and_split()` 은 **Deprecated** → 사용하지 말 것
-- 청킹은 `unstructured`가 옵션으로 지원하므로, 별도 splitter 없이 로더 옵션으로 처리 (→ `chunking.md`)
+- `loader.load()` 는 **`List[Document]`** 반환
+- 로더에 따라 기본 출력 단위가 다름 (unstructured=요소 단위, docling=`export_type`에 따름, upstage=`split`에 따름)
+- `load_and_split()` 은 **Deprecated** → 표준은 `load()` 후 splitter의 `split_documents()` 사용
+- 로더 상당수가 **파싱과 동시에 청킹/분할 옵션**을 제공 (→ `../chunking/chunking.md`)
 
-## 3. 이미지 (OCR)
+## 3. 이미지 (OCR) — 공통 고려사항
 
 - 이미지는 텍스트가 없으므로 **OCR이 필요**함
-- 방법: ① OCR 엔진 **로컬 설치 + unstructured** 사용, ② **국내/해외 OCR 서비스** 사용
+- 방법: ① OCR 엔진 **로컬 설치 + 로더** 사용, ② **국내/해외 OCR 서비스** 사용
 - **품질 고려 시**:
-  - **표가 포함**되어 있거나 레이아웃이 복잡하면 → unstructured 기본 OCR보다 **별도 서비스**가 더 정확함
+  - **표가 포함**되어 있거나 레이아웃이 복잡하면 → 기본 OCR보다 **별도 서비스**가 더 정확함
   - **한글이 포함**되어 있으면 → **국내용 서비스**가 더 안정적
+- 로더별 OCR 세부는 각 하위 문서 참고 (예: `unstructured/loader.md`)
 
-## 4. 참고 문서
+## 4. 폴더 구조
 
-- LangChain `UnstructuredLoader` 사용법: https://docs.langchain.com/oss/python/integrations/document_loaders/unstructured_file
+```
+loading/
+├── loader.md                ← (이 문서) 전체 개요·인덱스
+├── unstructured/            UnstructuredLoader 파싱
+│   ├── loader.md            unstructured 전용 상세
+│   ├── 01-docx.ipynb
+│   ├── 02-csv.ipynb
+│   ├── 03-png.ipynb
+│   └── 04.pdf.ipynb
+└── docling/                 DoclingLoader 파싱
+    ├── loader.md            docling 전용 상세
+    ├── 01-docx.ipynb
+    ├── 03-png.ipynb         (이미지 OCR — docling 적합 용도)
+    └── 04.pdf.ipynb
+```
+
+> ※ CSV 등 이미 구조화된 데이터엔 docling 부적합 → pandas 등 경량 도구 권장 (상세 → `docling/loader.md`)
+
+## 5. 참고 문서
+
 - LangChain Document Loader 공식문서: https://docs.langchain.com/oss/python/integrations/document_loaders
