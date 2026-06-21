@@ -45,14 +45,18 @@ loading/
 │   ├── 02-csv.ipynb
 │   ├── 03-png.ipynb
 │   └── 04.pdf.ipynb
-└── docling/                 DoclingLoader 파싱
-    ├── loader.md            docling 전용 상세
-    ├── 01-docx.ipynb
-    ├── 03-png.ipynb         (이미지 OCR — docling 적합 용도)
-    └── 04.pdf.ipynb
+├── docling/                 DoclingLoader 파싱
+│   ├── loader.md            docling 전용 상세
+│   ├── 01-docx.ipynb
+│   ├── 03-png.ipynb         (이미지 OCR — docling 적합 용도)
+│   └── 04.pdf.ipynb
+└── upstage/                 UpstageDocumentParseLoader 파싱 (클라우드 API)
+    ├── loader.md            upstage 전용 상세
+    ├── 03-png.ipynb
+    └── 04-pdf.ipynb
 ```
 
-> ※ CSV 등 이미 구조화된 데이터엔 docling 부적합 → pandas 등 경량 도구 권장 (상세 → `docling/loader.md`)
+> ※ CSV 등 이미 구조화된 데이터엔 docling·upstage 부적합 → pandas 등 경량 도구 권장
 
 ## 5. 참고 문서
 

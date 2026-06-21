@@ -43,12 +43,7 @@ docling은 **형식마다 다른 backend·pipeline**을 사용함 (같은 doclin
 
 ## 5. 출력 모드 (`export_type`)
 
-| 모드                     | 동작 |
-|------------------------|------|
-| (default) `DOC_CHUNKS` | 내장 청커로 청크를 나눠서 반환 (→ 청킹 `../../chunking/chunking.md`) |
-| `MARKDOWN`             | 문서 전체를 1개 Document(마크다운)로 반환 → 외부 splitter와 조합 |
-
-- 출처: [LangChain Docling 통합](https://docs.langchain.com/oss/python/integrations/document_loaders/docling)
+- `export_type`(`DOC_CHUNKS`/`MARKDOWN`)은 **출력 단위(청킹) 관련** → `../../chunking/docling/chunking.md` 참고
 
 ## 6. 참고 문서
 
