@@ -16,6 +16,33 @@
 | `basic` | 구조 무시, 크기(`max_characters`) 채워서 자르기 | 구조 없는 줄글 (에세이·로그·자막) |
 | `by_title` | 제목(섹션) 만나면 새 청크 시작 | 구조 있는 문서 (법령·계약서·논문·매뉴얼) |
 
+### 전략 분류 + 도구 매핑
+
+알려진 청킹 전략은 크게 5가지, unstructured는 그중 2가지(`basic`·`by_title`)만 제공하고 나머지는 LangChain 공식 문서의 splitter를 참고
+
+**분류별 설명**
+
+- **고정 길이** : 글자 수나 토큰 수 기준(예: 500자)으로 무조건 자르는 방식
+- **재귀** : 단락(`\n\n`) → 줄바꿈(`\n`) → 공백 순서로 큰 단위부터 시도하며 크기가 맞을 때까지 작게 잘라가는 방식
+- **문서 구조** : 마크다운 헤더(`#`, `##`)·HTML 태그·목차·표(Table) 등 문서 구조를 기준으로 나눔
+- **의미 기반** : 임베딩 모델로 문맥을 분석해 주제·의미가 바뀌는 지점(Breakpoint)을 찾아 분할
+- **에이전틱/LLM** : LLM이 문서 전체를 읽고 핵심 명제(Proposition)나 의도에 맞춰 직접 분할 지점을 결정
+
+**도구 매핑**
+
+| 분류 | unstructured 청킹 전략 옵션 | 대표 도구 (그 외) |
+|------|------|------|
+| 고정 길이 | △ `basic` (오픈소스, 요소를 크기로 채움·순수 고정길이 X) | LangChain `CharacterTextSplitter`<br>https://docs.langchain.com/oss/python/integrations/splitters/character_text_splitter |
+| 재귀 | 없음 | LangChain `RecursiveCharacterTextSplitter`<br>https://docs.langchain.com/oss/python/integrations/splitters/recursive_text_splitter |
+| 문서 구조 | `by_title`(섹션, 오픈소스) · `by_page`(페이지, 상용) | LangChain Markdown·HTML·JSON splitter<br>https://docs.langchain.com/oss/python/integrations/splitters |
+| 의미 기반 | `by_similarity`(임베딩 유사도, 상용) | LangChain `SemanticChunker` (`langchain_experimental`)<br>- |
+| 에이전틱/LLM | 없음 | **공식 구현 없음** → 직접 LLM 호출로 구현<br>- |
+
+- → unstructured는 **문서 구조 기반에 강함**(`by_title`·`by_page`), 의미 기반은 상용 전용, 재귀·에이전틱은 미제공
+- 출처(unstructured): [오픈소스 chunking](https://docs.unstructured.io/open-source/core-functionality/chunking)
+- ※ `by_page`·`by_similarity`는 unstructured **상용 Platform/API 전용**(무료 15,000페이지 + 초과분 과금), 오픈소스 라이브러리엔 없음
+- ※ `SemanticChunker`는 `langchain_experimental.text_splitter`에 실재(deprecated 아님, GitHub 이슈 #35553에서 확인)하나, 새 레퍼런스 사이트 개편으로 **개별 클래스의 안정적 공식 URL이 현재 없음**(딥링크가 검색 랜딩으로 리다이렉트됨)
+
 ## 3. 청킹 옵션
 
 | 옵션 | 의미 | 비고 |
@@ -44,7 +71,6 @@ loader = UnstructuredLoader(
     languages=['kor'],
 )
 ```
-
 ## 4. 참고 문서
 
 - `unstructured` 청킹 옵션: https://docs.unstructured.io/open-source/core-functionality/chunking
