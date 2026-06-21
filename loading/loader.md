@@ -73,6 +73,7 @@ loader = UnstructuredLoader(
 
 - LangChain `UnstructuredLoader` 사용법: https://docs.langchain.com/oss/python/integrations/document_loaders/unstructured_file
 - `unstructured` 청킹 옵션: https://docs.unstructured.io/open-source/core-functionality/chunking
+- LangChain Document Loader 공식문서: https://docs.langchain.com/oss/python/integrations/document_loaders
 
 ## 7. 참고 내용
 
