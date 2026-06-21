@@ -23,8 +23,7 @@ LangChain은 청킹을 크게 두 카테고리로 제공
 | **docling** | `export_type` (`DOC_CHUNKS`·`MARKDOWN`) + `chunker`(예: `HybridChunker`) | 구조·토큰 기반 청킹 또는 통째 마크다운 | https://docs.langchain.com/oss/python/integrations/document_loaders/docling |
 | **upstage** | `split` (`none`·`page`·`element`) | 분할 안 함 / 페이지 / 요소 단위 (※ 크기 기반 청킹이 아니라 **구조 단위 분할**) | https://docs.langchain.com/oss/python/integrations/document_loaders/upstage |
 
-- unstructured 상세 → `unstructured/chunking.md`
-- docling 상세 → `docling/chunking.md`
+- 상세: unstructured → `unstructured/chunking.md` · docling → `docling/chunking.md` · upstage → `upstage/chunking.md`
 
 ## 3. 독립 splitter — `RecursiveCharacterTextSplitter`
 
@@ -100,8 +99,11 @@ chunking/
 │   ├── 01-docx-chunking.ipynb
 │   ├── 02-csv-chunking.ipynb
 │   └── 03.pdf-chunking.ipynb
-├── docling/                             DoclingLoader 청킹 (DOC_CHUNKS/MARKDOWN)
+├── docling/                             DoclingLoader 청킹 (export_type)
+│   ├── chunking.md                      docling 전용 상세
 │   └── 01-docx-chunking.ipynb
+├── upstage/                             UpstageDocumentParseLoader 청킹 (split)
+│   └── chunking.md                      upstage 전용 상세
 └── recursive-character-text-splitter/   RecursiveCharacterTextSplitter 예제
     └── 01-docx-chunking.ipynb
 ```
