@@ -5,7 +5,7 @@
 > 다음 단계(검색·리트리버)는 `../retrieval/` (예정)
 > 도구별 상세는 각 하위 폴더(`chroma/` 등) 참고
 
-## 1. 인터페이스 (공식)
+## 1. 인터페이스
 
 모든 벡터 스토어는 아래 메서드로 통일됨 → DB만 갈아끼우면 됨
 
@@ -21,26 +21,26 @@
 - 임베딩을 직접 호출할 필요 없음 → 벡터 스토어가 내부에서 대신 호출함 (`../embedding/embedding.md` 18번 줄 참고)
 - `from_documents(documents, embedding, ...)`는 "생성 + add_documents"를 한 줄로 합친 편의 메서드 (deprecated 아님)
 
-## 2. 두 가지 생성 방식 (공식)
+## 2. 두 가지 생성 방식
 
 | 방식 | 코드 | 언제 |
 |------|------|------|
-| **생성 → 추가** | `vs = Chroma(...)` → `vs.add_documents(docs, ids)` | 표준 인터페이스, 나중에 추가·삭제·id 관리할 때 |
-| **한 번에** | `vs = Chroma.from_documents(docs, embedding, ...)` | 한 방에 다 넣고 시작할 때 (간단) |
+| **생성 → 추가** | `vector_store = Chroma(...)` → `vector_store.add_documents(docs, ids)` | 표준 인터페이스, 나중에 추가·삭제·id 관리할 때 |
+| **한 번에** | `vector_store = Chroma.from_documents(docs, embedding, ...)` | 한 방에 다 넣고 시작할 때 (간단) |
 
 - 공식 개념 문서는 표준 인터페이스(`add_documents`)를 우선 설명, 통합 문서는 `from_documents`도 함께 제공
 - ⚠️ 생성자 인자명은 `embedding_function`, `from_documents` 인자명은 `embedding` (헷갈리기 쉬움)
 
-## 3. 제공자 선택지
+## 3. providers 선택지
 
-| 제공자 | 클래스 | 패키지 | 특징 |
+| providers | 클래스 | 패키지 | 특징 |
 |--------|--------|--------|------|
 | InMemory | `InMemoryVectorStore` | `langchain-core` | 메모리 전용, 학습·테스트용 (재실행 시 사라짐) |
 | Chroma | `Chroma` | `langchain-chroma` | 로컬 퍼시스트(파일 저장), 프로토타입 표준 |
 | FAISS | `FAISS` | `langchain-community` | Meta 라이브러리, 로컬·고속 (※ community 아카이브 주의) |
 | Pinecone·Qdrant·Milvus·PGVector | 각 클래스 | 각 패키지 | 서버형, 운영·대규모 |
 
-- 공식 목록(다수 제공자): https://docs.langchain.com/oss/python/integrations/vectorstores
+- 전체 providers 목록: https://docs.langchain.com/oss/python/integrations/vectorstores
 - Chroma 상세 → `chroma/vector-store.md`
 
 ## 4. 유사도 점수 읽는 법

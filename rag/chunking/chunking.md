@@ -1,14 +1,14 @@
 # 청킹(Chunking) 개요
 
-문서를 청크로 나누는 방법 정리, LangChain 공식 문서 기준으로 선택지가 여러 갈래로 나뉨
+문서를 청크로 나누는 방법 정리, LangChain 문서 기준으로 선택지가 여러 갈래로 나뉨
 > 로딩(파싱)·설치 전제는 `../loading/loader.md` 참고
 > 도구별 상세는 각 하위 폴더(`unstructured/`, `docling/`, `recursive-character-text-splitter/`) 참고
 
-## 1. 두 갈래 (공식 문서 기준)
+## 1. 두 갈래
 
 LangChain은 청킹을 크게 두 카테고리로 제공
 
-| 갈래 | 무엇 | 공식 문서 |
+| 갈래 | 무엇 | 참고 문서 |
 |------|------|-----------|
 | **로더 내장 청킹** | 로더가 파싱하면서 옵션으로 청킹/분할까지 수행 | https://docs.langchain.com/oss/python/integrations/document_loaders |
 | **독립 splitter** | 이미 로드된 텍스트를 별도로 잘라줌 | https://docs.langchain.com/oss/python/integrations/splitters/recursive_text_splitter |
@@ -17,7 +17,7 @@ LangChain은 청킹을 크게 두 카테고리로 제공
 
 ## 2. 로더 내장 청킹 (docling · unstructured · upstage 등)
 
-| 로더 | 내장 옵션 | 동작 | 공식 문서 |
+| 로더 | 내장 옵션 | 동작 | 참고 문서 |
 |------|-----------|------|-----------|
 | **unstructured** | `chunking_strategy` (`basic`·`by_title`) | 요소를 크기로 묶거나 섹션 경계로 분할 | https://docs.unstructured.io/open-source/core-functionality/chunking |
 | **docling** | `export_type` (`DOC_CHUNKS`·`MARKDOWN`) + `chunker`(예: `HybridChunker`) | 구조·토큰 기반 청킹 또는 통째 마크다운 | https://docs.langchain.com/oss/python/integrations/document_loaders/docling |

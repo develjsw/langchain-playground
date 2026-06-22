@@ -4,11 +4,11 @@
 > 청킹(chunking) 내용은 `../chunking/chunking.md` 참고
 > 도구별 상세는 각 하위 폴더(`unstructured/`, `docling/`) 참고
 
-## 1. 로더 선택지 (공식 문서 기준)
+## 1. 로더 선택지
 
 LangChain document_loaders에는 다양한 로더가 동급으로 나열됨 (특정 권장 없음)
 
-| 로더 | 패키지 | 특징 | 공식 문서 |
+| 로더 | 패키지 | 특징 | 참고 문서 |
 |------|--------|------|-----------|
 | **unstructured** | `langchain-unstructured` + `unstructured` | 요소(element) 단위 파싱, 청킹 옵션 내장 | https://docs.langchain.com/oss/python/integrations/document_loaders/unstructured_file |
 | **docling** | `langchain-docling` | PDF·DOCX·PPTX·HTML 등을 레이아웃·표 포함 구조로 파싱 | https://docs.langchain.com/oss/python/integrations/document_loaders/docling |
@@ -60,4 +60,4 @@ loading/
 
 ## 5. 참고 문서
 
-- LangChain Document Loader 공식문서: https://docs.langchain.com/oss/python/integrations/document_loaders
+- LangChain Document Loader 문서: https://docs.langchain.com/oss/python/integrations/document_loaders
