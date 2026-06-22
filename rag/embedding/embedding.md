@@ -2,7 +2,7 @@
 
 텍스트를 벡터로 변환하는 방법 정리, LangChain은 여러 제공자를 동일 인터페이스로 제공
 > 이전 단계(청킹)는 `../chunking/chunking.md` 참고
-> 다음 단계(벡터 저장·검색)는 `../vectorstore/` (예정)
+> 다음 단계(벡터 저장·검색)는 `../vector-store/vector-store.md` 참고
 > 도구별 상세는 각 하위 폴더(`openai/` 등) 참고
 
 ## 1. 인터페이스 (공식)
