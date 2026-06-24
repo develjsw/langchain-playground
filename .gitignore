@@ -7,5 +7,4 @@
 
 .venv
 
-/rag/vector-store/chroma/chroma
-/rag/vector-store/chroma/chroma-db
+/rag/vector-store/chroma/chroma-db*

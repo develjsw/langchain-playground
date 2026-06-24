@@ -55,11 +55,29 @@ vector_store = Chroma(
 ## 3. CRUD (id 기반)
 
 ```python
-# 수정
+# 수정 (단수): document_id 하나
+vector_store.update_document(document_id=uuids[0], document=updated_doc)
+# 수정 (복수): ids 리스트로 여러 개 한 번에
 vector_store.update_documents(ids=[uuids[0]], documents=[updated_doc])
 # 삭제
 vector_store.delete(ids=[uuids[-1]])
 ```
+
+- 여기서 `document_id`/`ids`는 **add 시점에 부여된 그 문서의 id** → 방법1에서 직접 만든 `uuids`가 그 값
+- ⚠️ `add_documents`에 `ids`를 안 넘기면 Chroma가 id를 자동 생성 → 나중에 `get`으로 조회하지 않으면 알 수 없음 → `uuids`로 직접 부여하면 update/delete 관리가 쉬움 (LangChain `Chroma.add_texts` 소스 기준: `ids` 미지정 시 `uuid4` 자동 생성)
+
+### 저장된 값 조회 (`get`)
+
+```python
+# 특정 id만
+vector_store.get(ids=[uuids[0]])
+
+# 앞 3개 미리보기
+vector_store.get(limit=3)
+```
+
+- `get`은 기본적으로 `ids`/`documents`/`metadatas`를 반환 (`embeddings`만 무거워서 제외) → `include`로 따로 지정할 필요 없음, `embeddings`까지 보려면 `include=['embeddings']`
+- 조회는 LangChain `Chroma`의 public 메서드 `get` 사용 (안정적인 공식 인터페이스)
 
 ## 4. 검색
 
