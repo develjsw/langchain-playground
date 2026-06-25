@@ -8,3 +8,4 @@
 .venv
 
 /rag/vector-store/chroma/chroma-db*
+/rag/retrieval/chroma/chroma-db*
