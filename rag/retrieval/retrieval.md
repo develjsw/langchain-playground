@@ -36,8 +36,10 @@ retriever.invoke('거주자의 정의는?')
 ```
 retrieval/
 ├── retrieval.md              ← (이 문서) 전체 개요·인덱스
-└── chroma/                   Chroma 기반 retriever 실습
-    └── retrieval.md          chroma 전용 상세
+├── chroma/                   Chroma 기반 retriever 실습
+│   └── retrieval.md          chroma 전용 상세
+└── pinecone/                 Pinecone 기반 retriever 실습
+    └── retrieval.md          pinecone 전용 상세
 ```
 
 ## 5. 참고 문서

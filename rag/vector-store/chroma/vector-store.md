@@ -93,14 +93,9 @@ for res, score in vector_store.similarity_search_with_score('거주자의 정의
     print(f'[SIM={score:3f}] {res.page_content[:80]}')
 ```
 
-## 5. Retriever로 변환 (다음 단계 경계)
+## 5. 다음 단계 (Retrieval)
 
-```python
-retriever = vector_store.as_retriever(search_kwargs={'k': 3})
-retriever.invoke('거주자의 정의는?')
-```
-
-- `as_retriever`부터는 **retrieval 영역** → 상세는 다음 단계에서 다룸
+- `as_retriever`로 retriever 변환부터는 **retrieval 영역** → `../../retrieval/chroma/retrieval.md` 참고
 
 ## 6. 주의
 

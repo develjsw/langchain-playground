@@ -78,14 +78,9 @@ vector_store.delete(ids=[uuids[-1]])
 
 - `ids`는 add 시점에 부여한 그 문서의 id → 직접 만든 `uuids`가 그 값
 
-## 6. Retriever로 변환 (다음 단계 경계)
+## 6. 다음 단계 (Retrieval)
 
-```python
-retriever = vector_store.as_retriever(search_kwargs={'k': 3})
-retriever.invoke('거주자의 정의는?')
-```
-
-- `as_retriever`부터는 **retrieval 영역** → 상세는 다음 단계에서 다룸
+- `as_retriever`로 retriever 변환부터는 **retrieval 영역** → `../../retrieval/pinecone/retrieval.md` 참고
 
 ## 7. 참고
 
