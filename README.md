@@ -20,6 +20,10 @@ LangChain의 패키지 통합 및 분리 작업으로 인해 Deprecated 되거�
   - Vector Store: [vector-store/vector-store.md](rag/vector-store/vector-store.md)
   - Retrieval: [retrieval/retrieval.md](rag/retrieval/retrieval.md)
 
-- LangGraph ---- Next Task ----
+- LangGraph: (사전 지식 → 그래프 기초 → 챗봇 → 에이전트)
+  - 사전 지식: [00-prerequisites/prerequisites.md](langgraph/00-prerequisites/prerequisites.md)
+  - 그래프 기초: [01-graph-basics/graph-basics.md](langgraph/01-graph-basics/graph-basics.md)
+  - 챗봇: [02-chatbot/chatbot.md](langgraph/02-chatbot/chatbot.md)
+  - 에이전트: [03-agent/agent.md](langgraph/03-agent/agent.md)
 
 - Graph RAG: ---- Next Task ----
