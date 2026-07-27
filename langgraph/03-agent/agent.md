@@ -9,3 +9,7 @@ LLM이 도구 호출을 스스로 결정하는 Tool Calling Agent 정리
 ## 2. 대화 메모리
 
 - 노트북: [02-agent-memory.ipynb](02-agent-memory.ipynb)
+
+## 3. 스레드 격리
+
+- 노트북: [03-agent-thread.ipynb](03-agent-thread.ipynb)
