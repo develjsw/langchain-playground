@@ -9,3 +9,5 @@
 
 /rag/vector-store/chroma/chroma-db*
 /rag/retrieval/chroma/chroma-db*
+
+/langgraph/03-agent/checkpoints.db*
